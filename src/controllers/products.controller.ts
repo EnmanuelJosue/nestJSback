@@ -9,12 +9,16 @@ import {
   Delete,
   HttpStatus,
   HttpCode,
-  Res,
+  // ParseIntPipe,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { ProductsService } from 'src/services/products.service';
+import { ParseIntPipe } from 'src/common/parse-int.pipe';
+import { CreateProductDto, UpdateProductDto } from 'src/dtos/products.dtos';
 
 @Controller('products')
 export class ProductsController {
+  constructor(private productService: ProductsService) {}
+
   @Get('filter')
   getProductFilter() {
     return `Soy el filter`;
@@ -22,10 +26,11 @@ export class ProductsController {
 
   @Get(':productId')
   @HttpCode(HttpStatus.ACCEPTED)
-  getOne(@Res() response: Response, @Param('productId') productId: string) {
-    response.status(200).send({
-      message: `este es el product con id: ${productId}`,
-    });
+  getOne(@Param('productId', ParseIntPipe) productId: number) {
+    // response.status(200).send({
+    //   message: `este es el product con id: ${productId}`,
+    // });
+    return this.productService.findOne(productId);
   }
 
   @Get()
@@ -34,31 +39,31 @@ export class ProductsController {
     @Query('offset') offset = 0,
     @Query('brand') brand: string,
   ) {
-    return {
-      message: `products  limit:${limit}, offset:${offset}, brand: ${brand}`,
-    };
+    // return {
+    //   message: `products  limit:${limit}, offset:${offset}, brand: ${brand}`,
+    // };
+    return this.productService.findAll();
   }
 
   @Post()
-  create(@Body() payload: any) {
-    return {
-      message: 'Accion de crear',
-      payload,
-    };
+  create(@Body() payload: CreateProductDto) {
+    // return {
+    //   message: 'Accion de crear',
+    //   payload,
+    // };
+    return this.productService.create(payload);
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() payload: any) {
-    return {
-      id,
-      payload,
-    };
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateProductDto,
+  ) {
+    return this.productService.update(id, payload);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: number) {
-    return {
-      id,
-    };
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.productService.delete(+id);
   }
 }
