@@ -8,7 +8,7 @@ import {
   Delete,
   ParseIntPipe,
 } from '@nestjs/common';
-import { CreateCustomerDto, UpdateCustomerDto } from 'src/dtos/customer.dtos';
+import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customer.dtos';
 
 import { CustomersService } from '../services/customers.service';
 
