@@ -9,7 +9,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customer.dtos';
+import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customer.dto';
 
 import { CustomersService } from '../services/customers.service';
 
