@@ -1,64 +1,57 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/products/entities/product.entity';
+import { Repository } from 'typeorm';
 import { CreateProductDto, UpdateProductDto } from '../dtos/products.dto';
 
 @Injectable()
 export class ProductsService {
-  private counterId = 1;
-
-  private products: Product[] = [
-    {
-      id: 1,
-      name: 'product 1',
-      description: 'bla bla',
-      price: 122,
-      image: '',
-      stock: 12,
-    },
-  ];
+  constructor(
+    @InjectRepository(Product) private productRepo: Repository<Product>,
+  ) {}
 
   findAll() {
-    return this.products;
+    return this.productRepo.find();
   }
 
   findOne(id: number) {
-    const product = this.products.find((item) => item.id === id);
+    const product = this.productRepo.findOne(id);
     if (!product) {
       throw new NotFoundException(`Product ${id} not found`);
     }
     return product;
   }
 
-  create(payload: CreateProductDto) {
-    console.log(payload);
+  // create(payload: CreateProductDto) {
+  //   console.log(payload);
 
-    this.counterId += 1;
-    const newProduct = {
-      id: this.counterId,
-      ...payload,
-    };
-    this.products.push(newProduct);
-    return newProduct;
-  }
+  //   this.counterId += 1;
+  //   const newProduct = {
+  //     id: this.counterId,
+  //     ...payload,
+  //   };
+  //   this.products.push(newProduct);
+  //   return newProduct;
+  // }
 
-  update(id: number, payload: UpdateProductDto) {
-    const product = this.findOne(id);
-    const index = this.products.findIndex((item) => item.id === id);
-    this.products[index] = {
-      ...product,
-      ...payload,
-    };
-    return this.products[index];
-  }
+  // update(id: number, payload: UpdateProductDto) {
+  //   const product = this.findOne(id);
+  //   const index = this.products.findIndex((item) => item.id === id);
+  //   this.products[index] = {
+  //     ...product,
+  //     ...payload,
+  //   };
+  //   return this.products[index];
+  // }
 
-  delete(id: number) {
-    const product = this.findOne(id);
-    if (!product) {
-      return {
-        message: 'No product',
-      };
-    }
-    const index = this.products.findIndex((item) => item.id === id);
-    return this.products.splice(index, 1);
-  }
+  // delete(id: number) {
+  //   const product = this.findOne(id);
+  //   if (!product) {
+  //     return {
+  //       message: 'No product',
+  //     };
+  //   }
+  //   const index = this.products.findIndex((item) => item.id === id);
+  //   return this.products.splice(index, 1);
+  // }
 }
