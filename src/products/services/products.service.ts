@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/products/entities/product.entity';
 import { Repository } from 'typeorm';
@@ -26,7 +26,15 @@ export class ProductsService {
     return product;
   }
 
+  async findProductExist(name: string) {
+    const exist = await this.productRepo.findOne({ name });
+    if (exist) {
+      throw new HttpException('Product exist', 409);
+    }
+  }
+
   async create(data: CreateProductDto) {
+    await this.findProductExist(data.name);
     const newProduct = this.productRepo.create(data);
     if (data.brandId) {
       const brand = await this.brandService.findOne(data.brandId);
@@ -36,6 +44,7 @@ export class ProductsService {
   }
 
   async update(id: number, changes: UpdateProductDto) {
+    await this.findProductExist(changes.name);
     const product = await this.findOne(id);
     if (changes.brandId) {
       const brand = await this.brandService.findOne(changes.brandId);
