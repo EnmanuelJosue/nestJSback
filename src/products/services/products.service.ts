@@ -3,23 +3,27 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/products/entities/product.entity';
 import { Repository } from 'typeorm';
 import { CreateProductDto, UpdateProductDto } from '../dtos/products.dto';
-import { BrandsService } from './brands.service';
+import { Brand } from '../entities/brand.entity';
+import { Category } from '../entities/category.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product) private productRepo: Repository<Product>,
-    private brandService: BrandsService,
+    @InjectRepository(Brand) private brandRepo: Repository<Brand>,
+    @InjectRepository(Category) private categoryRepo: Repository<Category>,
   ) {}
 
   findAll() {
     return this.productRepo.find({
-      relations: ['brand'],
+      relations: ['brand', 'categories'],
     });
   }
 
   async findOne(id: number) {
-    const product = await this.productRepo.findOne(id);
+    const product = await this.productRepo.findOne(id, {
+      relations: ['brand', 'categories'],
+    });
     if (!product) {
       throw new NotFoundException(`Product ${id} not found`);
     }
@@ -37,9 +41,20 @@ export class ProductsService {
     await this.findProductExist(data.name);
     const newProduct = this.productRepo.create(data);
     if (data.brandId) {
-      const brand = await this.brandService.findOne(data.brandId);
+      const brand = await this.brandRepo.findOne(data.brandId);
       newProduct.brand = brand;
     }
+    if (data.categoryIds) {
+      if (data.categoryIds.length === 0) {
+        throw new HttpException('Categories is empty array', 400);
+      }
+      const categories = await this.categoryRepo.findByIds(data.categoryIds);
+      if (data.categoryIds.length !== categories.length) {
+        throw new HttpException('Categories dont exist', 404);
+      }
+      newProduct.categories = categories;
+    }
+
     return this.productRepo.save(newProduct);
   }
 
@@ -47,10 +62,30 @@ export class ProductsService {
     await this.findProductExist(changes.name);
     const product = await this.findOne(id);
     if (changes.brandId) {
-      const brand = await this.brandService.findOne(changes.brandId);
+      const brand = await this.brandRepo.findOne(changes.brandId);
       product.brand = brand;
     }
+    if (changes.categoryIds) {
+      if (changes.categoryIds.length === 0) {
+        throw new HttpException('Categories is empty array', 400);
+      }
+      const categories = await this.categoryRepo.findByIds(changes.categoryIds);
+      if (changes.categoryIds.length !== categories.length) {
+        throw new HttpException('Categories dont exist', 404);
+      }
+      product.categories = categories;
+    }
     this.productRepo.merge(product, changes);
+    return this.productRepo.save(product);
+  }
+
+  async removeCategoryByProduct(productId: number, categoryId: number) {
+    const product = await this.productRepo.findOne(productId, {
+      relations: ['categories'],
+    });
+    product.categories = product.categories.filter(
+      (item) => item.id !== categoryId,
+    );
     return this.productRepo.save(product);
   }
 

@@ -33,7 +33,7 @@ import config from './config';
     UsersModule,
     HttpModule.registerAsync({
       useFactory: () => ({
-        timeout: 1000,
+        timeout: 3000,
         maxRedirects: 5,
       }),
     }),
