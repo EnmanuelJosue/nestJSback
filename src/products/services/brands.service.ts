@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateBrandDto, UpdateBrandDto } from 'src/products/dtos/brand.dto';
 import { Brand } from 'src/products/entities/brand.entity';
@@ -13,16 +13,24 @@ export class BrandsService {
   }
 
   async findOne(id: number) {
-    const brand = await this.brandRepo.findOne(id);
+    const brand = await this.brandRepo.findOne(id, {
+      relations: ['products'],
+    });
     if (!brand) {
       throw new NotFoundException(`Brand #${id} not found`);
     }
     return brand;
   }
 
-  create(data: CreateBrandDto) {
+  async create(data: CreateBrandDto) {
+    const { name } = data;
+    const exist = await this.brandRepo.findOne({ name });
+    if (exist) {
+      throw new HttpException('Name already exists', 409);
+    }
     const newBrand = this.brandRepo.create(data);
-    return this.brandRepo.save(newBrand);
+    const rta = await this.brandRepo.save(newBrand);
+    return rta;
   }
 
   async update(id: number, changes: UpdateBrandDto) {
