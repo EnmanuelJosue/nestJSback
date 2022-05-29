@@ -5,11 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToMany,
-  JoinTable,
 } from 'typeorm';
 
 import { Product } from './product.entity';
-@Entity()
+@Entity({
+  name: 'categories',
+})
 export class Category {
   @PrimaryGeneratedColumn()
   id: number;
@@ -18,18 +19,19 @@ export class Category {
   name: string;
 
   @CreateDateColumn({
+    name: 'create_at',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   createAt: Date;
 
   @UpdateDateColumn({
+    name: 'update_at',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   updateAt: Date;
 
   @ManyToMany(() => Product, (product) => product.categories)
-  @JoinTable() // JoinTable solo va en 1 lado de la relación
   products: Product[];
 }

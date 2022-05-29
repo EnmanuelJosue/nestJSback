@@ -6,21 +6,26 @@ import {
   Entity,
   Column,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Order } from './order.entity';
 
-@Entity()
+@Entity({
+  name: 'order-items',
+})
 export class OrderItem {
   @PrimaryGeneratedColumn()
   id: number;
 
   @CreateDateColumn({
+    name: 'create_at',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   createAt: Date;
 
   @UpdateDateColumn({
+    name: 'update_at',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
@@ -33,5 +38,6 @@ export class OrderItem {
   product: Product;
 
   @ManyToOne(() => Order, (order) => order.items)
+  @JoinColumn({ name: 'order_id' })
   order: Order;
 }
