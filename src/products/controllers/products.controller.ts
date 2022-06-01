@@ -13,7 +13,9 @@ import {
   // ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Public } from 'src/auth/decorators/public.decorator';
+
 import { ProductsService } from 'src/products/services/products.service';
 import { ParseIntPipe } from 'src/common/parse-int.pipe';
 import {
@@ -22,7 +24,7 @@ import {
   UpdateProductDto,
 } from '../dtos/products.dto';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
@@ -43,6 +45,7 @@ export class ProductsController {
   }
 
   @Get()
+  @Public()
   getProducts(@Query() params: FilterProductsDto) {
     return this.productService.findAll(params);
   }
