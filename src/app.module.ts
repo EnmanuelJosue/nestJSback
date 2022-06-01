@@ -29,6 +29,7 @@ import config from './config';
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_PORT: Joi.number().required(),
         POSTGRES_HOST: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
       }),
     }),
     ProductsModule,
@@ -56,7 +57,6 @@ import config from './config';
         return value;
       },
     },
-    AuthService,
   ],
 })
 export class AppModule {}
