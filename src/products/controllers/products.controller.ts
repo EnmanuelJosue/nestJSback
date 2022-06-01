@@ -14,8 +14,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
-
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/models/roles.model';
 import { ProductsService } from 'src/products/services/products.service';
 import { ParseIntPipe } from 'src/common/parse-int.pipe';
 import {
@@ -24,7 +26,7 @@ import {
   UpdateProductDto,
 } from '../dtos/products.dto';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
@@ -50,6 +52,7 @@ export class ProductsController {
     return this.productService.findAll(params);
   }
 
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() data: CreateProductDto) {
     return this.productService.create(data);
