@@ -10,6 +10,8 @@ import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { enviroments } from './enviroments';
+import { AuthService } from './auth/services/auth.service';
+import { AuthModule } from './auth/auth.module';
 import config from './config';
 
 @Module({
@@ -38,6 +40,7 @@ import config from './config';
       }),
     }),
     DatabaseModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
@@ -53,6 +56,7 @@ import config from './config';
         return value;
       },
     },
+    AuthService,
   ],
 })
 export class AppModule {}
