@@ -8,7 +8,6 @@ module.exports = {
   entities: ['src/**/*.entity.ts'],
   cli: {
     migrationsDir: 'src/database/migrations',
-    entitiesDir: 'src/**/*.entity.ts',
   },
   ssl: {
     rejectUnauthorized: false,

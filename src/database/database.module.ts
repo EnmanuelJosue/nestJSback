@@ -3,6 +3,7 @@ import { ConfigType } from '@nestjs/config';
 import { Client } from 'pg';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import config from '../config';
+import { getSsl } from 'src/common/get-ssl';
 
 const API_KEY = '123456';
 const API_KEY_PROD = '654321';
@@ -13,15 +14,14 @@ const API_KEY_PROD = '654321';
     TypeOrmModule.forRootAsync({
       inject: [config.KEY],
       useFactory: (configService: ConfigType<typeof config>) => {
+        const ssl = getSsl();
         return {
-          entities: ['src/**/*.entity{.ts,.js}'],
+          entities: ['dist/**/*.entity{.ts,.js}'],
           type: 'postgres',
           url: configService.postgresUrl,
           synchronize: false,
           autoLoadEntities: true,
-          ssl: {
-            rejectUnauthorized: false,
-          },
+          ssl,
         };
       },
     }),
@@ -34,11 +34,10 @@ const API_KEY_PROD = '654321';
     {
       provide: 'PG',
       useFactory: (configService: ConfigType<typeof config>) => {
+        const ssl = getSsl();
         const client = new Client({
           connectionString: configService.postgresUrl,
-          ssl: {
-            rejectUnauthorized: false,
-          },
+          ssl,
         });
         client.connect();
         return client;
