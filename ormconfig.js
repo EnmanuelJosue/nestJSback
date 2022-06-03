@@ -1,14 +1,12 @@
-import { join } from 'path';
-
 module.exports = {
   type: 'postgres',
   url: process.env.DATABASE_URL,
   synchronize: false,
   logging: false,
   migrationsRun: true,
-  migrations: [join(__dirname, '../migrations/**/*{.ts,.js}')],
+  migrations: ['src/database/migrations/*.ts'],
   migrationsTableName: 'migrations',
-  entities: [join(__dirname + './**/*.entity{.ts,.js}')],
+  entities: [__dirname + './**/*.entity{.ts,.js}'],
   cli: {
     migrationsDir: 'src/database/migrations',
   },
