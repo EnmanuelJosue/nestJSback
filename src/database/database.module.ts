@@ -16,7 +16,7 @@ const API_KEY_PROD = '654321';
       useFactory: (configService: ConfigType<typeof config>) => {
         const ssl = getSsl();
         return {
-          entities: ['dist/**/*.entity{.ts,.js}'],
+          entities: [__dirname + './**/*.entity{.ts,.js}'],
           type: 'postgres',
           url: configService.postgresUrl,
           synchronize: false,
